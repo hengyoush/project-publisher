@@ -32,7 +32,7 @@ public class AppPackageBuilder implements PackageBuilder {
     /**                      private methods                     **/
     /**----------------------------------------------------------**/
 
-    private void scan(DirType[] dirs, Project project) {
+    private void scan(DirType[] dirs, Project project)  {
         for (DirType dir : dirs) {
             File logs = new File(project.getPackageRoot().getAbsolutePath() + File.separator + dir.toString());
             if (dir.needPreCreate() && !logs.exists() && logs.mkdir()) {

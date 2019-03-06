@@ -6,6 +6,7 @@ public class Version implements Comparable<Version> {
 
     public static final String LATEST = "LATEST";
     public static final Version START_VERSION = Version.of("0.0.1");
+    public static final String DOT = ".";
 
     private final Integer left;
     private final Integer mid;
@@ -29,7 +30,7 @@ public class Version implements Comparable<Version> {
     }
 
     public String getStr() {
-        return "" + left + mid + right;
+        return new StringBuilder().append(left).append(DOT).append(mid).append(DOT).append(right).toString();
     }
 
     public Integer getLeft() {

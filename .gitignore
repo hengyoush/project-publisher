@@ -28,5 +28,7 @@ hs_err_pid*
 *eclipse*
 
 /target/**
+/work/**
 settings.json
+launch.json
 .factorypath

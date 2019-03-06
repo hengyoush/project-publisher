@@ -1,6 +1,8 @@
 package esaas.devops.jenkins.common;
 
 import esaas.devops.jenkins.publish.remote.RemoteAddrWrapper;
+import hudson.Launcher;
+
 import java.io.File;
 
 public abstract class Project {
@@ -26,6 +28,8 @@ public abstract class Project {
     private VersionUpdateType versionUpdateType;
     /** 传输协议， 如：ftp、sftp等 **/
     private ProtocolType protocolType;
+    /** 用于运行命令行的工具 */
+    private Launcher launcher;
 
     /**
      * 子类实现该方法，返回工程类型
@@ -133,5 +137,13 @@ public abstract class Project {
 
     public void setProtocolType(ProtocolType protocolType) {
         this.protocolType = protocolType;
+    }
+
+    public Launcher getLauncher() {
+        return launcher;
+    }
+    
+    public void setLauncher(Launcher launcher) {
+        this.launcher = launcher;
     }
 }

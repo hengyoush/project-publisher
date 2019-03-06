@@ -14,12 +14,15 @@ public class RemoteAddrWrapper {
     private final String password;
     /** 远程端口号 **/
     private final Integer port;
+    /** 远程传输目录 */
+    private final String remoteWorkDir;
 
-    public RemoteAddrWrapper(String url, String username, String password, Integer port) {
+    public RemoteAddrWrapper(String url, String username, String password, Integer port, String remoteWorkDir) {
         this.url = url;
         this.username = username;
         this.password = password;
         this.port = port;
+        this.remoteWorkDir = remoteWorkDir;
     }
 
     public String getUrl() {
@@ -37,4 +40,13 @@ public class RemoteAddrWrapper {
     public Integer getPort() {
         return port;
     }
+
+    /**
+     * @return the remoteWorkDir
+     */
+    public String getRemoteWorkDir() {
+        return remoteWorkDir;
+    }
+
+    
 }

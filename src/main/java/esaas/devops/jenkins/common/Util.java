@@ -1,6 +1,7 @@
 package esaas.devops.jenkins.common;
 
 import hudson.FilePath;
+import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import esaas.devops.jenkins.publish.remote.RemoteAddrWrapper;
@@ -17,48 +18,71 @@ import java.util.Properties;
 
 public class Util {
 
+    /**
+     * properties相关属性key
+     */
+
+    private static final String DEVOPS_PUBLISH_PROJECT = "devops.docker.project";
     private static final String DEVOPS_PROJECT_TYPE = "devops.projectType";
     private static final String DEVOPS_PROJECT_KEY = "devops.projectKey";
     private static final String DEVOPS_PROJECT_NAME = "devops.projectName";
     private static final String DEVOPS_PUBLISH_PROTOCOL = "devops.publish.protocol";
-    private static final String DEVOPS_FTP_URL = "devops.ftp.url";
-    private static final String DEVOPS_FTP_LOGIN = "devops.ftp.login";
-    private static final String DEVOPS_FTP_PASSWORD = "devops.ftp.password";
-    private static final String DEVOPS_FTP_PORT = "devops.ftp.port";
+    private static final String DEVOPS_FTP_URL = "devops.remote.url";
+    private static final String DEVOPS_FTP_LOGIN = "devops.remote.login";
+    private static final String DEVOPS_FTP_PASSWORD = "devops.remote.password";
+    private static final String DEVOPS_FTP_PORT = "devops.remote.port";
+    private static final String DEVOPS_REMOTE_WORKDIR = "devops.remote.workdir";
     private static final String DEVOPS_PUBLISH_TYPE = "devops.publish.type";
     private static final String DEVOPS_TARGET_PROJ_ROOT = "devops.target.proj.root";
     private static final String DEVOPS_VERSION_CHANGE_TYPE = "devops.version.changeType";
 
-    public static Project getProjectFromProperties(Properties props, AbstractBuild<?, ?> build) {
+    public static Project getProjectFromProperties(Properties props, AbstractBuild<?, ?> build, Launcher launcher) {
         final AbstractProject<?, ?> project = ((AbstractBuild<?, ?>) build).getProject();
         try {
+            /**
+             * 工程路径相关
+             */
             String projectTypeStr = (String) props.get(DEVOPS_PROJECT_TYPE);
             ProjectType projectType = ProjectType.valueOf(projectTypeStr);
             Project projectInner = Project.of(projectType);
             String workspacePath = Objects.requireNonNull(build.getWorkspace()).toURI().getPath();
             projectInner.setProjectKey((String) props.get(DEVOPS_PROJECT_KEY)); // 类似efp.console.middle
             projectInner.setProjectName((String) props.get(DEVOPS_PROJECT_NAME));// 类似efp.console.impl
-            String projectRoot = workspacePath + File.separator + project.getName();
-            projectInner.setProjectRoot(new File(projectRoot));
-            projectInner.setPackageRoot(new File(projectRoot + File.separator +
-                    projectInner.getProjectKey().replace(".", "-")));
+            // String projectRoot = workspacePath + File.separator + project.getName();
+            projectInner.setProjectRoot(new File(workspacePath));
+            projectInner.setPackageRoot(
+                    new File(workspacePath + File.separator + projectInner.getProjectKey().replace(".", "-")));
 
+            /**
+             * 远程传输相关
+             */
             ProtocolType protocol = ProtocolType.valueOf((String) props.get(DEVOPS_PUBLISH_PROTOCOL));
             projectInner.setProtocolType(protocol);
             RemoteAddrWrapper remoteAddr;
             if (protocol == ProtocolType.FTP) {
-                remoteAddr = new RemoteAddrWrapper(
-                        (String) props.get(DEVOPS_FTP_URL),
-                        (String) props.get(DEVOPS_FTP_LOGIN),
-                        (String) props.get(DEVOPS_FTP_PASSWORD),
-                        Integer.valueOf((String) props.get(DEVOPS_FTP_PORT)));
+                remoteAddr = new RemoteAddrWrapper((String) props.get(DEVOPS_FTP_URL),
+                        (String) props.get(DEVOPS_FTP_LOGIN), (String) props.get(DEVOPS_FTP_PASSWORD),
+                        Integer.valueOf((String) props.get(DEVOPS_FTP_PORT)),
+                        (String) props.get(DEVOPS_REMOTE_WORKDIR));
             } else {
                 throw new IllegalArgumentException("不支持的protocol： " + protocol);
             }
-
-            projectInner.setRemoteAddr(remoteAddr);
-            projectInner.setPackageType(PackageType.valueOf((String) props.get(DEVOPS_PUBLISH_TYPE)));
             projectInner.setTargetProjRoot((String) props.get(DEVOPS_TARGET_PROJ_ROOT));
+            projectInner.setRemoteAddr(remoteAddr);
+
+            /**
+             * 发布类型相关（如是否是docker）
+             */
+            projectInner.setPackageType(PackageType.valueOf((String) props.get(DEVOPS_PUBLISH_TYPE)));
+            if (projectInner.getPackageType() == PackageType.docker) {
+                DockerProject dockerProject = new DockerProject(projectInner);
+                dockerProject.setTargetProject((String) props.get(DEVOPS_PUBLISH_PROJECT));
+                projectInner = dockerProject;
+            }
+           
+            /**
+             * 版本管理相关
+             */
             VersionUpdateType changeType;
             try {
                 changeType = VersionUpdateType.valueOf((String) props.get(DEVOPS_VERSION_CHANGE_TYPE));
@@ -66,6 +90,12 @@ public class Util {
                 changeType = VersionUpdateType.SMALL;
             }
             projectInner.setVersionUpdateType(changeType);
+
+            /**
+             *  其他
+             *  */
+            projectInner.setLauncher(launcher);
+
             return projectInner;
         } catch (Exception e) {
             getLogger().println("buildMiddleProject异常");
@@ -135,7 +165,7 @@ public class Util {
         }
     }
 
-    private static String getSrcTargetPath(Project project) {
+    public static String getSrcTargetPath(Project project) {
         return getTrueProjectRoot(project) + File.separator + "target";
     }
 

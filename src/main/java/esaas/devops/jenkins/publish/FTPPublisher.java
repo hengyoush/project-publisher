@@ -38,12 +38,14 @@ public class FTPPublisher extends AbstractPublisher {
     Version getNextVersion(Project project) {
         try {
             // 确认版本
-            String appRoot = client.printWorkingDirectory() + ""; // TODO
+            String appRoot = project.getRemoteAddrWapper().getRemoteWorkDir();
             client.changeWorkingDirectory(appRoot);
             FTPFile[] ftpFiles = client.listDirectories(appRoot);
             List<Version> versions = new ArrayList<>(ftpFiles.length);
             for (FTPFile ftpFile : ftpFiles) {
-                versions.add(Version.of(ftpFile.getName()));
+                if (!ftpFile.getName().equals(Version.LATEST)) {
+                    versions.add(Version.of(ftpFile.getName()));
+                }
             }
             return Util.getNextVersion(versions, project.getVersionUpdateType());
         } catch (IOException e) {

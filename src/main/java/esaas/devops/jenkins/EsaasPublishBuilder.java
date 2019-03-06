@@ -33,6 +33,9 @@ public class EsaasPublishBuilder extends Builder implements SimpleBuildStep {
     @DataBoundConstructor
     public EsaasPublishBuilder() {}
 
+    // 远程调试
+    // set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8080,suspend=n
+    // mvn hpi:run
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
         Util.setLogger(listener.getLogger());
@@ -40,7 +43,7 @@ public class EsaasPublishBuilder extends Builder implements SimpleBuildStep {
         try {
             Properties properties = Util.loadPropertiesFromString(this.properties);
             // 构建project对象
-            Project projectInner = Util.getProjectFromProperties(properties, (AbstractBuild<?, ?>) run);
+            Project projectInner = Util.getProjectFromProperties(properties, (AbstractBuild<?, ?>) run, launcher);
             // 打包
             PackageBuilder builder = PackageBuilderFactory.getPackageBuilder(projectInner.getPackageType());
             builder.build(projectInner);
@@ -49,7 +52,7 @@ public class EsaasPublishBuilder extends Builder implements SimpleBuildStep {
             publisher.publish(projectInner);
         } catch (Exception e) {
             e.printStackTrace(Util.getLogger());
-        }
+        } 
     }
 
     public String getProperties() { return properties; }

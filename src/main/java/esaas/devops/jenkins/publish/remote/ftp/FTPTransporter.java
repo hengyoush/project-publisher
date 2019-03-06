@@ -28,9 +28,9 @@ public class FTPTransporter implements Transporter {
 
     @Override
     public void transport(File src, RemoteAddrWrapper remoteAddr) {
-        // 上传 TODO
+        // 上传 
         try {
-            String appRoot = client.printWorkingDirectory() + "";
+            String appRoot = remoteAddr.getRemoteWorkDir();
             upload(client, src, appRoot);
         } catch (IOException e) {
             e.printStackTrace(Util.getLogger());
@@ -42,11 +42,12 @@ public class FTPTransporter implements Transporter {
     }
 
     private void upload(FTPClient client, File uploadFile, String appRoot) throws IOException {
-        try (InputStream in = new FileInputStream(uploadFile)) {
+        try (InputStream in1 = new FileInputStream(uploadFile); 
+                InputStream in2 = new FileInputStream(uploadFile)) {
             String uploadPath = appRoot + File.separator + project.getVersion().getStr();
             client.makeDirectory(uploadPath); // 创建对应version的目录
             client.changeWorkingDirectory(uploadPath);
-            client.storeFile(uploadFile.getName(), in); // 开始上传文件
+            client.storeFile(uploadFile.getName(), in1); // 开始上传文件
 
             String latestPath = appRoot + File.separator + Version.LATEST;
             FTPFile[] ftpFiles = client.listFiles(latestPath);
@@ -54,7 +55,7 @@ public class FTPTransporter implements Transporter {
                 client.makeDirectory(latestPath);
             }
             client.changeWorkingDirectory(latestPath);
-            client.storeFile(uploadFile.getName(), in);
+            client.storeFile(uploadFile.getName(), in2);
         } catch (IOException e) {
             e.printStackTrace(Util.getLogger());
             throw e;
