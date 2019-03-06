@@ -16,6 +16,7 @@ import hudson.model.TaskListener;
  */
 public class DockerPackageBuilder implements PackageBuilder {
 
+    private static final String POM_XML = "pom.xml";
     private static final String CMD_C = "cmd /c ";
     private static final String JIB_CMD_TEMPLATE = "mvn compile -f ${pom} jib:buildTar -pl ${project} -P docker";
     private static final String POM_PLACE_HOLDER = "${pom}";
@@ -29,7 +30,7 @@ public class DockerPackageBuilder implements PackageBuilder {
         DockerProject dockerProject = (DockerProject) project;
         String projectRoot = dockerProject.getProjectRoot().getAbsolutePath();
         // 2. 执行mvn命令
-        String mvnCommand = JIB_CMD_TEMPLATE.replace(POM_PLACE_HOLDER, projectRoot + File.separator + "pom.xml")
+        String mvnCommand = JIB_CMD_TEMPLATE.replace(POM_PLACE_HOLDER, projectRoot + File.separator + POM_XML)
                 .replace(PROJECT_PLACE_HOLDER, dockerProject.getTargetProject());
         if (System.getProperty("os.name").toUpperCase().contains(OS.WINDOWS.name())) {
             mvnCommand = CMD_C + mvnCommand;

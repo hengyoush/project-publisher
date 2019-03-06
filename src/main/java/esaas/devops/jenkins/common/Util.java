@@ -1,20 +1,25 @@
 package esaas.devops.jenkins.common;
 
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import esaas.devops.jenkins.publish.remote.RemoteAddrWrapper;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
+
+import esaas.devops.jenkins.publish.remote.RemoteAddrWrapper;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
 
 public class Util {
 
@@ -37,7 +42,6 @@ public class Util {
     private static final String DEVOPS_VERSION_CHANGE_TYPE = "devops.version.changeType";
 
     public static Project getProjectFromProperties(Properties props, AbstractBuild<?, ?> build, Launcher launcher) {
-        final AbstractProject<?, ?> project = ((AbstractBuild<?, ?>) build).getProject();
         try {
             /**
              * 工程路径相关
