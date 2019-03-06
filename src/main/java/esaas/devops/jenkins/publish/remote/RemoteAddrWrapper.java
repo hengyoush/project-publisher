@@ -14,8 +14,10 @@ public class RemoteAddrWrapper {
     private final String password;
     /** 远程端口号 **/
     private final Integer port;
-    /** 远程传输目录 */
+    /** 远程传输根目录 */
     private final String remoteWorkDir;
+    /** 上传的具体路径，相对于remoteWorkDir */
+    private String relativePath;
 
     public RemoteAddrWrapper(String url, String username, String password, Integer port, String remoteWorkDir) {
         this.url = url;
@@ -23,6 +25,14 @@ public class RemoteAddrWrapper {
         this.password = password;
         this.port = port;
         this.remoteWorkDir = remoteWorkDir;
+    }
+
+    public String getRelativePath() {
+        return relativePath;
+    }
+
+    public void setRelativePath(String relativePath) {
+        this.relativePath = relativePath;
     }
 
     public String getUrl() {
@@ -41,12 +51,7 @@ public class RemoteAddrWrapper {
         return port;
     }
 
-    /**
-     * @return the remoteWorkDir
-     */
     public String getRemoteWorkDir() {
         return remoteWorkDir;
     }
-
-    
 }

@@ -15,9 +15,10 @@ public abstract class AbstractPublisher implements Publisher {
         Transporter transporter = getTransporter(project);
         Version nextVer = getNextVersion(project);
         project.setVersion(nextVer);
-        transporter.transport(project.getTar(), project.getRemoteAddrWapper());
+        uploadWith(transporter, project);
     }
 
     abstract Transporter getTransporter(Project project);
     abstract Version getNextVersion(Project project);
+    abstract void uploadWith(Transporter transporter,Project project);
 }

@@ -3,6 +3,8 @@ package esaas.devops.jenkins.pkg;
 import java.io.File;
 import java.io.IOException;
 
+import com.kenai.jffi.Platform.OS;
+
 import esaas.devops.jenkins.common.DockerProject;
 import esaas.devops.jenkins.common.Project;
 import esaas.devops.jenkins.common.Util;
@@ -14,6 +16,7 @@ import hudson.model.TaskListener;
  */
 public class DockerPackageBuilder implements PackageBuilder {
 
+    private static final String CMD_C = "cmd /c ";
     private static final String JIB_CMD_TEMPLATE = "mvn compile -f ${pom} jib:buildTar -pl ${project} -P docker";
     private static final String POM_PLACE_HOLDER = "${pom}";
     private static final String PROJECT_PLACE_HOLDER = "${project}";
@@ -28,8 +31,8 @@ public class DockerPackageBuilder implements PackageBuilder {
         // 2. 执行mvn命令
         String mvnCommand = JIB_CMD_TEMPLATE.replace(POM_PLACE_HOLDER, projectRoot + File.separator + "pom.xml")
                 .replace(PROJECT_PLACE_HOLDER, dockerProject.getTargetProject());
-        if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")) {
-            mvnCommand = "cmd /c " + mvnCommand;
+        if (System.getProperty("os.name").toUpperCase().contains(OS.WINDOWS.name())) {
+            mvnCommand = CMD_C + mvnCommand;
         }
         Launcher launcher = dockerProject.getLauncher();
         TaskListener listener = launcher.getListener();

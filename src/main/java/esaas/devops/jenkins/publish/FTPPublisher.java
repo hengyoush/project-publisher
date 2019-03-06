@@ -9,6 +9,7 @@ import esaas.devops.jenkins.publish.remote.ftp.FTPTransporter;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class FTPPublisher extends AbstractPublisher {
                     remoteAddr.getUsername(),
                     remoteAddr.getPassword(),
                     remoteAddr.getPort());
-           return new FTPTransporter(this.client, project);
+           return new FTPTransporter(this.client);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -49,6 +50,35 @@ public class FTPPublisher extends AbstractPublisher {
             }
             return Util.getNextVersion(versions, project.getVersionUpdateType());
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    void uploadWith(Transporter transporter, Project project) {
+        try {
+            RemoteAddrWrapper remoteAddr = project.getRemoteAddrWapper();
+            remoteAddr.setRelativePath(
+                remoteAddr.getRemoteWorkDir() + File.separator + project.getVersion().getStr());
+            transporter.transport(project.getTar(), project.getRemoteAddrWapper());
+    
+            remoteAddr.setRelativePath(remoteAddr.getRemoteWorkDir() + File.separator + Version.LATEST);
+            transporter.transport(project.getTar(), remoteAddr);
+        } finally {
+            clean(project.getTar(), client);
+        }
+    }
+
+    private void clean(File src, FTPClient client) {
+        src.delete();
+        try {
+            if (client != null) {
+                client.logout();
+                client.disconnect();
+            }
+        } catch (IOException e) {
+            Util.getLogger().println("关闭FTPClient出错！");
+            e.printStackTrace(Util.getLogger());
             throw new RuntimeException(e);
         }
     }

@@ -52,6 +52,7 @@ public class EsaasPublishBuilder extends Builder implements SimpleBuildStep {
             publisher.publish(projectInner);
         } catch (Exception e) {
             e.printStackTrace(Util.getLogger());
+            throw e;
         } 
     }
 
