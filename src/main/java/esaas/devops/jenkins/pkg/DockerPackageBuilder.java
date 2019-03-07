@@ -53,7 +53,6 @@ public class DockerPackageBuilder implements PackageBuilder {
         File renameTo = new File(Util.getSrcTargetPath(project) + File.separator + 
                 project.getProjectKey().replace(",", "-") + "-image.tar");
         tar.renameTo(renameTo);
-        project.setTar(renameTo);
         return renameTo;
     }
 }

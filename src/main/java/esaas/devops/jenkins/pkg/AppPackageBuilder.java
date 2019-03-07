@@ -8,7 +8,8 @@ import esaas.devops.jenkins.common.DirType;
 import java.io.*;
 
 /**
- * 普通App应用打包处理类
+ * 使用App类型打包
+ * 特点：自动构建启停脚本，自动构建基础目录
  */
 public class AppPackageBuilder implements PackageBuilder {
 
@@ -19,18 +20,30 @@ public class AppPackageBuilder implements PackageBuilder {
      */
     @Override
     public File build(Project project) {
+        if (!validatePath(project)) {
+            throw new IllegalStateException("在进行APP类型的打包之前必须正确使用maven构建！");
+        } 
         String packageRoot = project.getPackageRoot().getAbsolutePath();
         if (!project.getPackageRoot().exists() && project.getPackageRoot().mkdirs()) {
             Util.getLogger().println("创建package root成功，路径：" + packageRoot);
         }
         scan(project.getProjectType().dirs(), project);
-        project.setTar(buildTar(project));
-        return project.getTar();
+        return buildTar(project);
     }
 
     /**----------------------------------------------------------**/
     /**                      private methods                     **/
     /**----------------------------------------------------------**/
+
+    /** 校验target、lib、classes目录是否存在 */
+    private boolean validatePath (Project project) {
+        if (Util.pathExists(Util.getSrcTargetPath(project)) && 
+            Util.pathExists(Util.getLibClassPath(project))  &&
+            Util.pathExists(Util.getSrcClassPath(project))) {
+            return true;
+        } 
+        return false;
+    }
 
     private void scan(DirType[] dirs, Project project)  {
         for (DirType dir : dirs) {

@@ -1,5 +1,12 @@
 package esaas.devops.jenkins;
 
+import java.io.IOException;
+import java.util.Properties;
+
+import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+
 import esaas.devops.jenkins.common.Project;
 import esaas.devops.jenkins.common.Util;
 import esaas.devops.jenkins.pkg.PackageBuilder;
@@ -15,16 +22,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
-import hudson.util.FormValidation;
 import jenkins.tasks.SimpleBuildStep;
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
-
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.util.Properties;
 
 public class EsaasPublishBuilder extends Builder implements SimpleBuildStep {
 
@@ -46,7 +44,7 @@ public class EsaasPublishBuilder extends Builder implements SimpleBuildStep {
             Project projectInner = Util.getProjectFromProperties(properties, (AbstractBuild<?, ?>) run, launcher);
             // 打包
             PackageBuilder builder = PackageBuilderFactory.getPackageBuilder(projectInner.getPackageType());
-            builder.build(projectInner);
+            projectInner.setTar(builder.build(projectInner));
             // 发布
             Publisher publisher = PublisherFactory.getPublisher(projectInner.getProtocolType());
             publisher.publish(projectInner);
@@ -65,17 +63,10 @@ public class EsaasPublishBuilder extends Builder implements SimpleBuildStep {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-        public FormValidation doCheckName(@QueryParameter String value, @QueryParameter boolean useFrench)
-                throws IOException, ServletException {
-            if (value.length() == 0)
-                return FormValidation.error(Messages.HelloWorldBuilder_DescriptorImpl_errors_missingName());
-            if (value.length() < 4)
-                return FormValidation.warning(Messages.HelloWorldBuilder_DescriptorImpl_warnings_tooShort());
-            if (!useFrench && value.matches(".*[éáàç].*")) {
-                return FormValidation.warning(Messages.HelloWorldBuilder_DescriptorImpl_warnings_reallyFrench());
-            }
-            return FormValidation.ok();
-        }
+        // public FormValidation doCheckName(@QueryParameter String value, @QueryParameter boolean useFrench)
+        //         throws IOException, ServletException {
+        //     return FormValidation.ok();
+        // }
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
@@ -86,7 +77,5 @@ public class EsaasPublishBuilder extends Builder implements SimpleBuildStep {
         public String getDisplayName() {
             return Messages.HelloWorldBuilder_DescriptorImpl_DisplayName();
         }
-
     }
-
 }

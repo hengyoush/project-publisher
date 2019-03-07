@@ -10,7 +10,7 @@ import java.io.File;
 /**
  * 对于Rule中台工程，需要进行特殊处理，即将rules文件夹单独放入lib文件夹内
  */
-public class RuleLibHandler extends LibHandler {
+public class RuleLibHandler extends DefaultLibHandler {
 
     @Override
     public void handle(Project project) {

@@ -4,53 +4,32 @@ import esaas.devops.jenkins.pkg.handler.*;
 
 public enum DirType {
     BIN("bin") {
-        @Override
-        public DirHandler getHandler() {
-            return BinHandler.INSTANCE;
-        }
-
-        @Override
-        public DirHandler getHandler(Project project) {
-            if (project.getProjectKey().contains("rule.middle")) {
-                return new RuleLibHandler();
-            }
-            return getHandler();
-        }
+        public DirHandler getHandler() { return BinHandler.INSTANCE; }
     },
     CONF("conf") {
-        @Override
-        public DirHandler getHandler() {
-            return ConfHandler.INSTANCE;
-        }
+        public DirHandler getHandler() { return ConfHandler.INSTANCE; }
     },
     LIB("lib") {
-        @Override
-        public DirHandler getHandler () {
-            return LibHandler.INSTANCE;
+        public DirHandler getHandler () { return DefaultLibHandler.INSTANCE; }
+        public DirHandler getHandler(Project project) {
+            return project.getProjectKey().contains("rule.middle") ? 
+                    new RuleLibHandler() : getHandler();
         }
     },
     LOGS("logs") {
-        @Override
-        public DirHandler getHandler () {
-            return LogsHandler.INSTANCE;
-        }
+        public DirHandler getHandler () { return LogsHandler.INSTANCE; }
     },
     WAR("war") {
-        @Override
-        public DirHandler getHandler () {
-            return WarHandler.INSTANCE;
-        }
-
-        @Override
-        public boolean needPreCreate () {
-            return false;
-        }
+        public DirHandler getHandler () {  return WarHandler.INSTANCE; }
+        public boolean needPreCreate () { return false; }
+    },
+    JAR("jar") {
+        public DirHandler getHandler() { return JarHandler.INSTANCE; }
+        public boolean needPreCreate() { return false; }
     };
 
     private final String name;
-    DirType(String name) {
-        this.name = name;
-    }
+    DirType(String name) { this.name = name; }
 
     public DirHandler getHandler(Project project) { return getHandler(); }
 
@@ -59,7 +38,5 @@ public enum DirType {
     public abstract DirHandler getHandler();
 
     @Override
-    public String toString() {
-        return this.name;
-    }
+    public String toString() { return this.name; }
 }

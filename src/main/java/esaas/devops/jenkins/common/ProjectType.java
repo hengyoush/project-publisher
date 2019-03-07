@@ -13,7 +13,7 @@ public enum ProjectType {
     },
     sprboot {
         public DirType[] dirs() {
-            return new DirType[] {DirType.BIN, DirType.LIB, DirType.CONF, DirType.LOGS};
+            return new DirType[] {DirType.JAR};
         }
     };
 

@@ -5,8 +5,6 @@ import esaas.devops.jenkins.common.Project;
 import esaas.devops.jenkins.common.ShellType;
 import esaas.devops.jenkins.common.Util;
 
-import static esaas.devops.jenkins.common.Util.getPkgRootDot;
-
 /**
  * 根据模板生成shell的实现类
  */
@@ -40,6 +38,11 @@ public class DefaultShellGenerator implements ShellGenerator {
                         targetProjRoot, projNameHyphen, projPkgDot);
             default: throw new IllegalArgumentException("非法的SHellType");
         }
+    }
+
+    private String getPkgRootDot(Project project) {
+        String projectName = project.getProjectKey();
+        return projectName.replace(".middle", ".service");
     }
 
     private static class ShellHolder {

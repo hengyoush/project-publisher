@@ -13,7 +13,7 @@ import java.io.IOException;
  * copy到packageRoot下的lib目录,将application.properties和key.properties也拷贝到
  * 指定目录的lib下。
  */
-public class LibHandler implements DirHandler {
+public class DefaultLibHandler implements DirHandler {
     private static final String APPLICATION_PROPERTIES = "application.properties";
     private static final String KEY_PROPERTIES = "key.properties";
 
@@ -49,8 +49,10 @@ public class LibHandler implements DirHandler {
         String appPropTarget = Util.getTargetDirStr(project, DirType.LIB) +
                 File.separator +
                 propertiesFileName;
-        new FilePath(new File(appPropSrc)).copyTo(new FilePath(new File(appPropTarget)));
+        Util.getFilePathFromPathStr(appPropSrc)
+        .copyTo
+        (Util.getFilePathFromPathStr(appPropTarget));
     }
 
-    public static final DirHandler INSTANCE = new LibHandler();
+    public static final DirHandler INSTANCE = new DefaultLibHandler();
 }

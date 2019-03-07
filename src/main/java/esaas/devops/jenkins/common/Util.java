@@ -154,17 +154,24 @@ public class Util {
     }
 
     public static FilePath getWarFileForFront(Project project) {
+        return getFileInSrcTargetPathBySuffix(project, DirType.WAR.toString());
+    }
+
+    public static FilePath getJarFileInSrcTargetPath(Project project) {
+        return getFileInSrcTargetPathBySuffix(project, DirType.JAR.toString());
+    }
+
+    public static FilePath getFileInSrcTargetPathBySuffix(Project project, final String suffix) {
         File target = new File(getSrcTargetPath(project));
         File[] files = target.listFiles(new FilenameFilter() {
-            @Override
             public boolean accept(File dir, String name) {
-                return name.endsWith("war");
+                return name.endsWith(suffix);
             }
         });
         if (files != null && files.length == 1) {
             return new FilePath(files[0]);
         } else {
-            Util.getLogger().println("该目录: " + target.getAbsolutePath() + "下不存在war包！");
+            Util.getLogger().println("该目录: " + target.getAbsolutePath() + "下不存在" + suffix + "!");
             return null;
         }
     }
@@ -173,20 +180,11 @@ public class Util {
         return getTrueProjectRoot(project) + File.separator + "target";
     }
 
-    private static PrintStream global_logger;
-
-    // TODO
-    public static String getPkgRootDot(Project project) {
-        String projectName = project.getProjectKey();
-        switch (project.getProjectType()) {
-            case sprboot:
-            case middle: {
-                return projectName.replace(".middle", ".service");
-            }
-            case front:
-                default: return "";
-        }
+    public static boolean pathExists(String path) {
+        return new File(path).exists();
     }
+
+    private static PrintStream global_logger;
 
     private static final String SUFFIX_SH = ".sh";
 
