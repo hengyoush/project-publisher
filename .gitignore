@@ -32,3 +32,4 @@ hs_err_pid*
 settings.json
 launch.json
 .factorypath
+*.code-workspace
