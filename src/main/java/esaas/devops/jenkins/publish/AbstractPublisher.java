@@ -1,6 +1,7 @@
 package esaas.devops.jenkins.publish;
 
 import esaas.devops.jenkins.common.Project;
+import esaas.devops.jenkins.common.Util;
 import esaas.devops.jenkins.common.Version;
 import esaas.devops.jenkins.publish.remote.Transporter;
 
@@ -12,8 +13,10 @@ import esaas.devops.jenkins.publish.remote.Transporter;
 public abstract class AbstractPublisher implements Publisher {
     @Override
     public void publish(Project project) {
+        Util.getLogger().println("开始发布");
         Transporter transporter = getTransporter(project);
         Version nextVer = getNextVersion(project);
+        Util.getLogger().println("此次上传工程version： " + nextVer.getStr());
         project.setVersion(nextVer);
         uploadWith(transporter, project);
     }

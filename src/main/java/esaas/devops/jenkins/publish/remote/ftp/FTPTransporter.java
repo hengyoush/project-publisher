@@ -36,9 +36,14 @@ public class FTPTransporter implements Transporter {
 
     private void upload(FTPClient client, File uploadFile, String uploadPath) throws IOException {
         try (InputStream in1 = new FileInputStream(uploadFile)) {
-            client.makeDirectory(uploadPath); // 创建对应version的目录
-            client.changeWorkingDirectory(uploadPath);
-            client.storeFile(uploadFile.getName(), in1); // 开始上传文件
+            Util.getLogger().println("开始上传文件，上传路径：" + uploadPath + "本地上传文件路径：" + uploadFile.getAbsolutePath());
+            if (client.makeDirectory(uploadPath) &&  // 创建对应version的目录
+            client.changeWorkingDirectory(uploadPath) && 
+            client.storeFile(uploadFile.getName(), in1))  {// 开始上传文件 
+                Util.getLogger().println("上传文件完成");
+                return;
+            }
+           throw new RuntimeException("上传失败");
         } catch (IOException e) {
             e.printStackTrace(Util.getLogger());
             throw e;

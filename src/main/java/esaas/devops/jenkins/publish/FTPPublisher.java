@@ -61,7 +61,6 @@ public class FTPPublisher extends AbstractPublisher {
             remoteAddr.setRelativePath(
                 remoteAddr.getRemoteWorkDir() + File.separator + project.getVersion().getStr());
             transporter.transport(project.getTar(), project.getRemoteAddrWapper());
-    
             remoteAddr.setRelativePath(remoteAddr.getRemoteWorkDir() + File.separator + Version.LATEST);
             transporter.transport(project.getTar(), remoteAddr);
         } finally {

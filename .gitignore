@@ -32,4 +32,14 @@ hs_err_pid*
 settings.json
 launch.json
 .factorypath
-*.code-workspace
+Maven_*.xml
+*-workspace
+
+.idea/.name
+.idea/compiler.xml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+jenkins-plugin-publish.code-workspace

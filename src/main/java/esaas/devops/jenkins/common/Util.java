@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
@@ -27,7 +28,6 @@ public class Util {
      * properties相关属性key
      */
 
-    private static final String DEVOPS_PUBLISH_PROJECT = "devops.docker.project";
     private static final String DEVOPS_PROJECT_TYPE = "devops.projectType";
     private static final String DEVOPS_PROJECT_KEY = "devops.projectKey";
     private static final String DEVOPS_PROJECT_NAME = "devops.projectName";
@@ -38,6 +38,8 @@ public class Util {
     private static final String DEVOPS_FTP_PORT = "devops.remote.port";
     private static final String DEVOPS_REMOTE_WORKDIR = "devops.remote.workdir";
     private static final String DEVOPS_PUBLISH_TYPE = "devops.publish.type";
+    private static final String DEVOPS_DOCKER_PROJECT = "devops.docker.project";
+    private static final String DEVOPS_DOCKER_ACTIVEPROFILE = "devops.docker.activeProfile";
     private static final String DEVOPS_TARGET_PROJ_ROOT = "devops.target.proj.root";
     private static final String DEVOPS_VERSION_CHANGE_TYPE = "devops.version.changeType";
 
@@ -80,7 +82,8 @@ public class Util {
             projectInner.setPackageType(PackageType.valueOf((String) props.get(DEVOPS_PUBLISH_TYPE)));
             if (projectInner.getPackageType() == PackageType.docker) {
                 DockerProject dockerProject = new DockerProject(projectInner);
-                dockerProject.setTargetProject((String) props.get(DEVOPS_PUBLISH_PROJECT));
+                dockerProject.setTargetProject((String) props.get(DEVOPS_DOCKER_PROJECT));
+                dockerProject.setActiveProfile((String) props.get(DEVOPS_DOCKER_ACTIVEPROFILE));
                 projectInner = dockerProject;
             }
            
@@ -224,6 +227,7 @@ public class Util {
             } else {
                 Util.getLogger().println("FTP连接成功。");
             }
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE); // 设置为二进制传输模式，默认为ASCII，会出现传输数据损坏的问题
         } catch (SocketException e) {
             e.printStackTrace(Util.getLogger());
             Util.getLogger().println("FTP的IP地址可能错误，请正确配置。");

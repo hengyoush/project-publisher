@@ -20,9 +20,9 @@ public class AppPackageBuilder implements PackageBuilder {
      */
     @Override
     public File build(Project project) {
-        if (!validatePath(project)) {
-            throw new IllegalStateException("在进行APP类型的打包之前必须正确使用maven构建！");
-        } 
+        // if (!validatePath(project)) {
+        //     throw new IllegalStateException("在进行APP类型的打包之前必须正确使用maven构建！");
+        // } 
         String packageRoot = project.getPackageRoot().getAbsolutePath();
         if (!project.getPackageRoot().exists() && project.getPackageRoot().mkdirs()) {
             Util.getLogger().println("创建package root成功，路径：" + packageRoot);
@@ -36,14 +36,14 @@ public class AppPackageBuilder implements PackageBuilder {
     /**----------------------------------------------------------**/
 
     /** 校验target、lib、classes目录是否存在 */
-    private boolean validatePath (Project project) {
-        if (Util.pathExists(Util.getSrcTargetPath(project)) && 
-            Util.pathExists(Util.getLibClassPath(project))  &&
-            Util.pathExists(Util.getSrcClassPath(project))) {
-            return true;
-        } 
-        return false;
-    }
+    // private boolean validatePath (Project project) {
+    //     if (Util.pathExists(Util.getSrcTargetPath(project)) && 
+    //         Util.pathExists(Util.getLibClassPath(project))  &&
+    //         Util.pathExists(Util.getSrcClassPath(project))) {
+    //         return true;
+    //     } 
+    //     return false;
+    // }
 
     private void scan(DirType[] dirs, Project project)  {
         for (DirType dir : dirs) {
@@ -62,9 +62,8 @@ public class AppPackageBuilder implements PackageBuilder {
     }
 
     private File buildTar(Project project) {
-        String packageRoot = project.getPackageRoot().getAbsolutePath();
         FilePath path = new FilePath(project.getPackageRoot());
-        String tarPath = packageRoot + File.separator + ".." +
+        String tarPath = project.getProjectRoot() +
                 File.separator +
                 project.getProjectName() + ".tar";
         File tarFile = new File(tarPath);
@@ -74,7 +73,8 @@ public class AppPackageBuilder implements PackageBuilder {
                 public boolean accept(File pathname) {
                     return true;
                 } });
-            Util.getLogger().println("写入tar包成功，开始清除");
+            Util.getLogger().println("写入tar包成功，开始清除" + path);
+            Util.getLogger().println("tar路径" + tarFile.getAbsolutePath());
             path.deleteRecursive();
             return tarFile;
         } catch (IOException | InterruptedException e) {

@@ -10,9 +10,24 @@ public class DockerProject extends Project {
     private Project project;
     /** 需要进行构建镜像的project名称，如efp.console.impl */
     private String targetProject;
-    
+    /** 指定profile，因为docker镜像也是需要某个profile的 */
+    private String activeProfile;
+    /**
+     * 是否需要自动生成镜像， 如果为true，那么本插件使用jib插件生成，请确保目标project的pom中的dockers
+     * profile含有jib插件配置， 如果为false，请确保镜像已经构建，并且给出镜像的路径 TODO 此功能还未实现
+     */
+    private Boolean needCreateImage;
+
     public DockerProject(Project project) {
         this.project = project;
+    }
+
+    public String getActiveProfile() {
+        return activeProfile;
+    }
+
+    public void setActiveProfile(String activeProfile) {
+        this.activeProfile = activeProfile;
     }
 
     @Override
@@ -131,5 +146,13 @@ public class DockerProject extends Project {
 
     public void setLauncher(Launcher launcher) {
         this.project.setLauncher(launcher);
+    }
+
+    public Boolean getNeedCreateImage() {
+        return needCreateImage;
+    }
+
+    public void setNeedCreateImage(Boolean needCreateImage) {
+        this.needCreateImage = needCreateImage;
     }
 }

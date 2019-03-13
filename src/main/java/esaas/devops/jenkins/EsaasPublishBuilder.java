@@ -36,7 +36,7 @@ public class EsaasPublishBuilder extends Builder implements SimpleBuildStep {
     // mvn hpi:run
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-        Util.setLogger(listener.getLogger());
+        Util.setLogger(launcher.getListener().getLogger());
         Util.getLogger().println(this.properties);
         try {
             Properties properties = Util.loadPropertiesFromString(this.properties);
